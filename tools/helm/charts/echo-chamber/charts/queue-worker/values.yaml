@@ -1,0 +1,25 @@
+# Default values for queue-worker.
+replicaCount: 1
+
+image:
+  repository: gcr.io/generic-website-hosting/echo-chamber-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

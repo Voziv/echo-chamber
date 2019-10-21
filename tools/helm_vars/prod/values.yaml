@@ -1,0 +1,34 @@
+global:
+    appConfig:
+      APP_NAME: 'Echo from voziv-cluster!!!'
+      APP_DEBUG: 'false'
+      LOG_CHANNEL: 'stderr'
+      SESSION_DRIVER: 'redis'
+      QUEUE_CONNECTION: 'redis'
+      CACHE_DRIVER: 'redis'
+
+web:
+  replicaCount: 2
+  appImage:
+    pullPolicy: Always
+  webImage:
+    pullPolicy: Always
+
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    hosts:
+      - host: echo-chamber.voziv.com
+        paths: ['/']
+
+
+queue-worker:
+  replicaCount: 2
+  image:
+    pullPolicy: Always
+
+task-scheduler:
+  replicaCount: 1
+  image:
+    pullPolicy: Always

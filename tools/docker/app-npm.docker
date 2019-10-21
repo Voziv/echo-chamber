@@ -1,0 +1,14 @@
+FROM node:11
+
+COPY ./package.json /var/www/build/
+COPY ./package-lock.json /var/www/build/
+WORKDIR /var/www/build
+
+RUN (npm ci || (cat /root/.npm/_logs/*.log && exit 1));
+
+COPY ./resources /var/www/build/resources
+COPY ./public /var/www/build/public
+COPY ./webpack.mix.js /var/www/build/
+
+RUN npm run production \
+    && rm -r node_modules

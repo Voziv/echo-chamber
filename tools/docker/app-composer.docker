@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1.0.0-experimental
+# to build run:
+# DOCKER_BUILDKIT=1 docker build --ssh default -f app.docker .
+FROM composer:1.9.0 as composer_build
+
+COPY ./composer.json /var/www/build/composer.json
+COPY ./composer.lock /var/www/build/composer.lock
+WORKDIR /var/www/build
+
+RUN --mount=type=ssh mkdir -p -m 0600 ~/.ssh \
+    && ssh-keyscan github.com >> ~/.ssh/known_hosts \
+    && composer --version \
+    && composer install \
+                --no-interaction \
+                --prefer-dist \
+                --no-suggest \
+                --no-scripts \
+                --no-dev \
+                --no-autoloader \
+                --ignore-platform-reqs \
+                --no-cache
+
+COPY . /var/www/build
+
+RUN mkdir -p bootstrap/cache && composer dumpautoload -o

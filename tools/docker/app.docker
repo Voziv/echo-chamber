@@ -1,0 +1,47 @@
+FROM echo-chamber-app-composer:latest as composer_build
+FROM php:7.4.0RC4-fpm-alpine3.10
+
+RUN set -xe \
+    && apk --no-cache add pcre-dev ${PHPIZE_DEPS} \
+    && pecl install redis \
+    && rm -rf /tmp/pear \
+    && docker-php-ext-install \
+        mysqli \
+        pdo \
+        pdo_mysql \
+    && docker-php-ext-enable \
+        mysqli \
+        pdo \
+        pdo_mysql \
+        redis
+
+COPY . /var/www/app
+WORKDIR /var/www/app
+COPY --from=composer_build /var/www/build/vendor /var/www/app/vendor
+COPY --from=composer_build --chown=www-data:www-data /var/www/build/bootstrap/cache /var/www/app/bootstrap/cache
+
+RUN    mkdir -p storage/app \
+    && mkdir -p storage/framework/cache \
+    && mkdir -p storage/framework/sessions \
+    && mkdir -p storage/framework/testing \
+    && mkdir -p storage/framework/views \
+    && mkdir -p storage/logs \
+    && chown -R www-data:www-data /var/www/app/storage \
+    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && rm .env \
+    && rm -rf tools
+
+# Override with custom opcache settings
+#COPY config/opcache.ini $PHP_INI_DIR/conf.d/
+
+# How do we run `php artisan migrate`?
+# Route caching is all messy if you have closures.
+# Config caching needs to happen at runtime so that we properly cache environment variables.
+# Docker entrypoint maybe? Run config cache and then start php-fpm afterwards?
+
+COPY tools/docker/app-entrypoint.sh /usr/local/bin/app-entrypoint
+RUN chmod +x /usr/local/bin/app-entrypoint
+
+ENTRYPOINT ["app-entrypoint"]
+CMD ["app-entrypoint"]
+

@@ -1,0 +1,15 @@
+# Default values for echo-chamber.
+global:
+  appConfig:
+    APP_NAME: 'Echo.....echo......echo'
+    APP_DEBUG: 'false'
+    DB_CONNECTION: 'mysql'
+  appSecrets:
+    DB_HOST: '127.0.0.1'
+    DB_DATABASE: 'echo-chamber'
+    DB_PORT: '3306'
+    DB_USERNAME: 'dbuser-changeme'
+    DB_PASSWORD: 'dbpass-changeme'
+    REDIS_HOST: '127.0.0.1'
+    REDIS_PORT: '6379'
+    REDIS_PASSWORD: 'redispass-changeme'
