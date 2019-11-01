@@ -13,20 +13,6 @@ NGINX_LATEST := ${NGINX_NAME}:latest
 
 build: build-app build-nginx
 
-build-composer:
-	@DOCKER_BUILDKIT=1 docker build \
-	--ssh default \
-	-t echo-chamber-app-composer:latest \
-	-f tools/docker/app-composer.docker .
-	@docker tag ${APP_IMG} ${APP_LATEST}
-
-build-npm:
-	@DOCKER_BUILDKIT=1 docker build \
-	--ssh default \
-	-t echo-chamber-app-npm:latest \
-	-f tools/docker/app-npm.docker .
-	@docker tag ${APP_IMG} ${APP_LATEST}
-
 build-app: build-composer
 	@DOCKER_BUILDKIT=1 docker build \
 	--ssh default \
@@ -39,6 +25,18 @@ build-nginx: build-npm
 	-t ${NGINX_IMG} \
 	-f tools/docker/nginx.docker .
 	@docker tag ${NGINX_IMG} ${NGINX_LATEST}
+
+build-composer:
+	@DOCKER_BUILDKIT=1 docker build \
+	--ssh default \
+	-t echo-chamber-app-composer:latest \
+	-f tools/docker/app-composer.docker .
+
+build-npm:
+	@DOCKER_BUILDKIT=1 docker build \
+	--ssh default \
+	-t echo-chamber-app-npm:latest \
+	-f tools/docker/app-npm.docker .
 
 docker-login:
 	@docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}

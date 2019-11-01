@@ -1,6 +1,6 @@
 global:
     appConfig:
-      APP_NAME: 'Echo from voziv-cluster!!!'
+      APP_NAME: 'Echo from voziv-cluster!!'
       APP_DEBUG: 'false'
       LOG_CHANNEL: 'stderr'
       SESSION_DRIVER: 'redis'

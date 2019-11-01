@@ -1,35 +1,43 @@
 FROM echo-chamber-app-composer:latest as composer_build
 FROM php:7.4.0RC4-fpm-alpine3.10
 
-RUN set -xe \
-    && apk --no-cache add pcre-dev ${PHPIZE_DEPS} \
-    && pecl install redis \
-    && rm -rf /tmp/pear \
-    && docker-php-ext-install \
-        mysqli \
-        pdo \
-        pdo_mysql \
-    && docker-php-ext-enable \
-        mysqli \
-        pdo \
-        pdo_mysql \
-        redis
+####################
+# Install extensions
+####################
+RUN set -eux; \
+        apk add --no-cache --virtual .build-deps \
+            ${PHPIZE_DEPS} \
+            # For redis
+            pcre-dev; \
+        \
+        pecl install redis; \
+        rm -rf /tmp/pear; \
+        docker-php-ext-enable redis; \
+        \
+        docker-php-ext-install \
+            pdo pdo_mysql mysqli; \
+        docker-php-ext-enable \
+            pdo pdo_mysql mysqli; \
+        \
+        apk del --no-network .build-deps;
 
 COPY . /var/www/app
 WORKDIR /var/www/app
 COPY --from=composer_build /var/www/build/vendor /var/www/app/vendor
 COPY --from=composer_build --chown=www-data:www-data /var/www/build/bootstrap/cache /var/www/app/bootstrap/cache
 
-RUN    mkdir -p storage/app \
-    && mkdir -p storage/framework/cache \
-    && mkdir -p storage/framework/sessions \
-    && mkdir -p storage/framework/testing \
-    && mkdir -p storage/framework/views \
-    && mkdir -p storage/logs \
-    && chown -R www-data:www-data /var/www/app/storage \
-    && mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
-    && rm .env \
-    && rm -rf tools
+RUN set -eux; \
+        mkdir -p storage/app; \
+        mkdir -p storage/framework/cache; \
+        mkdir -p storage/framework/sessions; \
+        mkdir -p storage/framework/testing; \
+        mkdir -p storage/framework/views; \
+        mkdir -p storage/logs; \
+        chown -R www-data:www-data /var/www/app/storage; \
+        \
+        mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
+        rm .env; \
+        rm -rf tools;
 
 # Override with custom opcache settings
 #COPY config/opcache.ini $PHP_INI_DIR/conf.d/
