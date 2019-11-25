@@ -12,18 +12,7 @@ cluster
 - [ ] Update chart to allow running several queue deployments working on 
       different queues
 
-## Installing / Upgrading echo-chamber
-```shell script
-helm tiller start
-# Install with the name of echo-staging in the default namespace.
-helm secrets upgrade \
-  --install echo-chamber \
-  -f tools/helm_vars/prod/secrets.yaml \
-  -f tools/helm_vars/prod/values.yaml \
-  tools/helm/charts/echo-chamber
 
-exit
-```
 
 ## Helm v2 plugins
 

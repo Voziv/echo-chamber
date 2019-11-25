@@ -3,8 +3,8 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-app-config
   labels:
-{{ include "echo-chamber.web.labels" . | indent 4 }}
+{{ include "echo-chamber.labels" . | indent 4 }}
 data:
-  {{- range $key, $value := .Values.global.appConfig }}
+  {{- range $key, $value := .Values.appConfig }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}

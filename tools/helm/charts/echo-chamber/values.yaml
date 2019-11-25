@@ -1,15 +1,129 @@
-# Default values for echo-chamber.
-global:
-  appConfig:
-    APP_NAME: 'Echo.....echo......echo'
-    APP_DEBUG: 'false'
-    DB_CONNECTION: 'mysql'
-  appSecrets:
-    DB_HOST: '127.0.0.1'
-    DB_DATABASE: 'echo-chamber'
-    DB_PORT: '3306'
-    DB_USERNAME: 'dbuser-changeme'
-    DB_PASSWORD: 'dbpass-changeme'
-    REDIS_HOST: '127.0.0.1'
-    REDIS_PORT: '6379'
-    REDIS_PASSWORD: 'redispass-changeme'
+################################################################################
+# Application configuration
+################################################################################
+appConfig:
+  APP_NAME: 'Echo.....echo......echo'
+  APP_DEBUG: 'false'
+  DB_CONNECTION: 'mysql'
+
+################################################################################
+# Application secrets
+################################################################################
+appSecrets:
+  DB_HOST: '127.0.0.1'
+  DB_DATABASE: 'echo-chamber'
+  DB_PORT: '3306'
+  DB_USERNAME: 'dbuser-changeme'
+  DB_PASSWORD: 'dbpass-changeme'
+  REDIS_HOST: '127.0.0.1'
+  REDIS_PORT: '6379'
+  REDIS_PASSWORD: 'redispass-changeme'
+
+################################################################################
+# Shared settings
+################################################################################
+nameOverride: ""
+fullnameOverride: ""
+
+imagePullSecrets:
+  - name: gcr-json-key
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: ratehub.test
+      paths: []
+
+  tls: []
+  #  - secretName: ratehub-test-tls
+  #    hosts:
+  #      - ratehub.test
+
+################################################################################
+# Web Pod
+################################################################################
+web:
+  replicaCount: 1
+
+  appImage:
+    repository: gcr.io/generic-website-hosting/echo-chamber-app
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  webImage:
+    repository: gcr.io/generic-website-hosting/echo-chamber-nginx
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+################################################################################
+# Queue Pod
+################################################################################
+queue_worker:
+  enabled: false
+  replicaCount: 1
+
+  image:
+    repository: gcr.io/generic-website-hosting/echo-chamber-app
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  resources: {}
+  #  limits:
+  #    cpu: 100m
+  #    memory: 128Mi
+  #  requests:
+  #    cpu: 100m
+  #    memory: 128Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+################################################################################
+# Task Scheduler Pod
+################################################################################
+task_scheduler:
+  enabled: false
+  replicaCount: 1
+
+  image:
+    repository: gcr.io/generic-website-hosting/echo-chamber-app
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+
+################################################################################
+# Additional Services
+################################################################################
+mysql:
+  enabled: false
+redis:
+  enabled: false
+  cluster.enabled: false

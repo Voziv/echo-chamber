@@ -1,23 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "echo-chamber.web.fullname" . }}
+  name: {{ include "echo-chamber.fullname" . }}
   labels:
-{{ include "echo-chamber.web.labels" . | indent 4 }}
+{{ include "echo-chamber.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.web.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "echo-chamber.web.name" . }}
+      app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: "web-server"
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/app.env-config.yaml") . | sha256sum }}
-        checksum/secret: {{ include (print $.Template.BasePath "/app.env-secret.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/app-config.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/app-secrets.yaml") . | sha256sum }}
       labels:
-        app.kubernetes.io/name: {{ include "echo-chamber.web.name" . }}
+        app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: "web-server"
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -25,8 +27,8 @@ spec:
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}-nginx
-          image: "{{ .Values.webImage.repository }}:{{ .Values.webImage.tag }}"
-          imagePullPolicy: {{ .Values.webImage.pullPolicy }}
+          image: "{{ .Values.web.webImage.repository }}:{{ .Values.web.webImage.tag }}"
+          imagePullPolicy: {{ .Values.web.webImage.pullPolicy }}
           ports:
             - name: http
               containerPort: 80
@@ -40,10 +42,10 @@ spec:
               path: /.health/readiness
               port: http
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+              {{- toYaml .Values.web.resources | nindent 12 }}
         - name: {{ .Chart.Name }}-app
-          image: "{{ .Values.appImage.repository }}:{{ .Values.appImage.tag }}"
-          imagePullPolicy: {{ .Values.appImage.pullPolicy }}
+          image: "{{ .Values.web.appImage.repository }}:{{ .Values.web.appImage.tag }}"
+          imagePullPolicy: {{ .Values.web.appImage.pullPolicy }}
           ports:
             - name: phpfpm
               containerPort: 9000
@@ -51,7 +53,7 @@ spec:
             tcpSocket:
               port: phpfpm
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
+                {{- toYaml .Values.web.resources | nindent 12 }}
           env:
             - name: CONTAINER_ROLE
               value: 'app'
@@ -68,15 +70,15 @@ spec:
                 name: {{ .Release.Name }}-app-config
             - secretRef:
                 name: {{ .Release.Name }}-app-secrets
-      {{- with .Values.nodeSelector }}
+            {{- with .Values.web.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-    {{- with .Values.affinity }}
+            {{- toYaml . | nindent 8 }}
+            {{- end }}
+            {{- with .Values.web.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+            {{- toYaml . | nindent 8 }}
+            {{- end }}
+            {{- with .Values.web.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}

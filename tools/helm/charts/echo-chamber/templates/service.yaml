@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "echo-chamber.web.fullname" . }}
+  name: {{ include "echo-chamber.fullname" . }}
   labels:
-{{ include "echo-chamber.web.labels" . | indent 4 }}
+{{ include "echo-chamber.labels" . | indent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,5 +12,6 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: {{ include "echo-chamber.web.name" . }}
+    app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/component: "web-server"

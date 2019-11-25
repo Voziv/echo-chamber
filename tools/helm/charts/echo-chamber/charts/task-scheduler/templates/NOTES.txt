@@ -1,1 +1,0 @@
-1. The task scheduler is a background process for running scheduled tasks & scheduling queued jobs.

@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "echo-chamber.fullname" . }}-queue-worker
+  labels:
+{{ include "echo-chamber.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.queue_worker.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: "queue-worker"
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/app-config.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/app-secrets.yaml") . | sha256sum }}
+      labels:
+        app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: "queue-worker"
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.queue_worker.image.repository }}:{{ .Values.queue_worker.image.tag }}"
+          imagePullPolicy: {{ .Values.queue_worker.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.queue_worker.resources | nindent 12 }}
+          env:
+            - name: CONTAINER_ROLE
+              value: 'queue'
+            - name: MY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-app-config
+            - secretRef:
+                name: {{ .Release.Name }}-app-secrets
+      {{- with .Values.queue_worker.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.queue_worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.queue_worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

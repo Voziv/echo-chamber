@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "echo-chamber.fullname" . }}-task-scheduler
+  labels:
+{{ include "echo-chamber.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.task_scheduler.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/component: "task-scheduler"
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/app-config.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/app-secrets.yaml") . | sha256sum }}
+      labels:
+        app.kubernetes.io/name: {{ include "echo-chamber.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/component: "task-scheduler"
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.task_scheduler.image.repository }}:{{ .Values.task_scheduler.image.tag }}"
+          imagePullPolicy: {{ .Values.task_scheduler.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.task_scheduler.resources | nindent 12 }}
+          env:
+            - name: CONTAINER_ROLE
+              value: 'scheduler-background-loop'
+            - name: MY_NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: MY_POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-app-config
+            - secretRef:
+                name: {{ .Release.Name }}-app-secrets
+      {{- with .Values.task_scheduler.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.task_scheduler.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.task_scheduler.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}

@@ -1,11 +1,11 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "echo-chamber.web.fullname" . -}}
-apiVersion: extensions/v1beta1
+{{- $fullName := include "echo-chamber.fullname" . -}}
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-{{ include "echo-chamber.web.labels" . | indent 4 }}
+{{ include "echo-chamber.labels" . | indent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

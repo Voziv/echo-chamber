@@ -1,1 +1,0 @@
-1. The queue worker is a background process for running queued jobs.
