@@ -39,6 +39,9 @@ RUN set -eux; \
         rm .env; \
         rm -rf tools;
 
+# Override php pool settings. Need moar children.
+COPY tools/docker/php-fpm-ool.ini /usr/local/etc/php-fpm.d/zz-app.conf
+
 # Override with custom opcache settings
 #COPY config/opcache.ini $PHP_INI_DIR/conf.d/
 
