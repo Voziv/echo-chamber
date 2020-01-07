@@ -2,4 +2,4 @@ apiVersion: v1
 appVersion: "1.0"
 description: Showcase application for deploying laravel to kubernetes.
 name: echo-chamber
-version: 0.1.0
+version: 0.0.1

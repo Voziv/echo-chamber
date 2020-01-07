@@ -1,2 +1,0 @@
-creation_rules:
-  - gcp_kms: 'projects/generic-website-hosting/locations/global/keyRings/voziv-sops/cryptoKeys/prod-sops'
