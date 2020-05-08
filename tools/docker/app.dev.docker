@@ -13,9 +13,9 @@ ARG DOCKER_XDEBUG_HEADER
 #    && echo 'xdebug.remote_autostart=0' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 #    && echo 'xdebug.profiler_enable=0' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 #    && echo 'xdebug.profiler_enable_trigger=1' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-#    && echo 'xdebug.profiler_output_dir=/var/www/ratehub/data/trace' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
+#    && echo 'xdebug.profiler_output_dir=/var/www/app/data/trace' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 #    && echo 'xdebug.remote_connect_back=1' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 #    && echo 'xdebug.auto_trace=0' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 #    && echo 'xdebug.trace_format=1' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
 #    && echo 'xdebug.trace_enable_trigger=1' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
-#    echo 'xdebug.trace_output_dir=/var/www/ratehub/data/trace' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+#    echo 'xdebug.trace_output_dir=/var/www/app/data/trace' >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini

@@ -38,13 +38,13 @@ ingress:
   # kubernetes.io/ingress.class: nginx
   # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: ratehub.test
+    - host: echo-chamber.test
       paths: []
 
   tls: []
-  #  - secretName: ratehub-test-tls
+  #  - secretName: echo-chamber-test-tls
   #    hosts:
-  #      - ratehub.test
+  #      - echo-chamber.test
 
 ################################################################################
 # Web Pod
